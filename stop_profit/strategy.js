@@ -90,7 +90,7 @@ phenotypes: {
 	  period_length: Phenotypes.ListOption(['20s','30s','40s','60s','90s', '3m', '5m', '10m', '15m', '30m', '1h']),
 	  min_periods: Phenotypes.Range(50, 50),
 
-    rsi_periods: Phenotypes.Range(50, 50),
+    rsi_periods: Phenotypes.Range(5, 50),
 
     stop_loss: Phenotypes.RangeFloat(-0.01, -0.1, 0.005),
     profit_stop_enable: Phenotypes.RangeFloat(0.01, 0.1, 0.001),
