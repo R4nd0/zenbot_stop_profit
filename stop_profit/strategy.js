@@ -92,9 +92,9 @@ phenotypes: {
 
     rsi_periods: Phenotypes.Range(5, 50),
 
-    stop_loss: Phenotypes.RangeFloat(-0.01, -0.1, 0.005),
-    profit_stop_enable: Phenotypes.RangeFloat(0.01, 0.1, 0.001),
-    profit_stop_trail: Phenotypes.RangeFloat(0.001, 0.03, 0.0001),
+    stop_loss: Phenotypes.RangeFactor(-0.01, -0.1, 0.005),
+    profit_stop_enable: Phenotypes.RangeFactor(0.01, 0.1, 0.001),
+    profit_stop_trail: Phenotypes.RangeFactor(0.001, 0.03, 0.0001),
    
   }
 }
