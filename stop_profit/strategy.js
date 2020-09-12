@@ -4,14 +4,15 @@ var z = require('zero-fill')
   , Phenotypes = require('../../../lib/phenotype')
 
 module.exports = {
-  name: 'stop_profit',
-  description: 'Proof of concept for implemetation of a stop profit with trailing stop',
+  name: 'stop_profit_rsi',
+  description: 'Proof of concept implemetation of a stop profit with trailing stop',
 
   getOptions: function () {
-    this.option('period', 'period length, same as --period_length', String, '30m')
-    this.option('period_length', 'period length, same as --period', String, '30m')
-    this.option('min_periods', 'min. number of history periods', Number, 50)
+    this.option('period', 'period length, same as --period_length', String, '5m')
+    this.option('period_length', 'period length, same as --period', String, '5m')
+    this.option('min_periods', 'min. number of history periods', Number, 100)
     this.option('rsi_periods', 'number of RSI periods', Number, 14)
+    this.option('rsi_oversold', 'oversold RSI value', Number, 30)
     this.option('stop_loss', 'negative decimal', Number, -0.05)
     this.option('profit_stop_enable', 'decimal', Number, 0.03)
     this.option('profit_stop_trail', 'decimal', Number, 0.005)
@@ -56,19 +57,19 @@ module.exports = {
       
       //Trailing stop triggered below the high watermark?
       if (s.last_trade_worth < s.high_watermark - s.options.profit_stop_trail
-        && s.high_watermark != 0 
-        && last_trade.type === 'buy') {
+        && s.high_watermark != 0) {
         s.signal = 'sell'
         s.high_watermark = 0  
       }
       //A stop loss also works quite well within a strategy
-      if (s.last_trade_worth <= s.options.stop_loss && last_trade.type === 'buy' ) {
+      if (s.last_trade_worth <= s.options.stop_loss) {
         s.signal = 'sell'
         s.high_watermark = 0  
       }
       //A buy signal must also come from somewhere. We pick a RSI here
-      if(s.period.rsi < 30
-        && s.high_watermark == 0 ){
+      if(s.period.rsi > s.options.rsi_oversold
+        && s.lookback[0].rsi < s.options.rsi_oversold
+        && s.high_watermark == 0){
         s.signal='buy'
      }   
       
@@ -88,13 +89,14 @@ phenotypes: {
 
     // -- common 
 	  period_length: Phenotypes.ListOption(['20s','30s','40s','60s','90s', '3m', '5m', '10m', '15m', '30m', '1h']),
-	  min_periods: Phenotypes.Range(50, 50),
+	  min_periods: Phenotypes.Range(100, 100),
 
-    rsi_periods: Phenotypes.Range(5, 50),
+    rsi_periods: Phenotypes.Range(10, 20),
+    rsi_oversold: Phenotypes.RangeFactor(15, 35, 5),
 
     stop_loss: Phenotypes.RangeFactor(-0.01, -0.1, 0.005),
     profit_stop_enable: Phenotypes.RangeFactor(0.01, 0.1, 0.001),
-    profit_stop_trail: Phenotypes.RangeFactor(0.001, 0.03, 0.0001),
+    profit_stop_trail: Phenotypes.RangeFactor(0.003, 0.03, 0.001),
    
   }
 }
